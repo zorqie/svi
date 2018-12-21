@@ -1,40 +1,82 @@
+html * {
+  background-color: #282c34;
+  color: white;
+  font-family: 'B612 Mono';
+  font-size: calc(8px + 0.75vmin);
+  line-height: 1.2;
+  margin:0; padding:0;
+}
 .App {
   text-align: center;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-}
-
-.inferno-logo {
-  background: #fff;
-  width: 6rem;
-  height: 6rem;
-  padding: 2rem;
-  border-radius: 2rem;
-}
-
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  min-height: 10vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #fff;
+footer {
+  font-size: xx-small;
+  position: fixed;
+  bottom: 0;
+  padding: 2px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+table {
+  text-align: right;
+  border-spacing: 1px;
+}
+table.px-grid * {
+  font-size: calc(8px + 0.5vmin);
+}
+table.px-grid th {
+  font-size: calc(5px + 0.5vmin)
+}
+tbody * {
+  padding: 0 3px;
+  border: 1px solid #666;
+}
+table th {
+  font-size: xx-small;
+  font-weight: normal;
+}
+table td {
+  width: 6.5vmin;
+  max-width: 6.75vmin;
+  height: 6vmin;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+table td.focus {
+  background-color: #444;
+}
+table td * {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255,128,0,0.35);
+  font-weight: normal;
+}
+table td.focus * {
+  background-color: rgba(255,128,0,0.75);
+  justify-content: center;
+}
+table.ui-grid td:hover, table.px-grid td:hover {
+  border-color: #aaa;
+}
+table.px-grid td {
+  width: 3.75vmin;
+  max-width: 3.75vmin;
+  height: 3.5vmin;
+  border: 1px solid #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+table.px-grid td * {
+  padding: 0;
 }
