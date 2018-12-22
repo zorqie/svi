@@ -1,24 +1,33 @@
 html * {
-  background-color: #282c34;
-  color: white;
+  background-color: #222;
+  color: #eee;
   font-family: 'B612 Mono';
   font-size: calc(8px + 0.75vmin);
   line-height: 1.2;
   margin:0; padding:0;
 }
-.App {
-  text-align: center;
+html *:focus {
+  outline: 2px solid #9cf;
 }
-
-.App-header {
-  min-height: 10vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+button, input {
+  border: 1px solid blue;
 }
-
+header {
+  height: 3em;
+}
+header .title {
+  background: #666;
+  color: #000;
+  padding: 0.5em;
+  font-size: 20px;
+  font-weight: bold;
+  float: left;
+}
+header #BigClock {
+  font-size: 24px;
+  padding: 0.5em 1em;
+  float: right;
+}
 footer {
   font-size: xx-small;
   position: fixed;
@@ -28,7 +37,9 @@ footer {
 
 table {
   text-align: right;
+  background: #666;
   border-spacing: 1px;
+  margin:2px;
 }
 table.px-grid * {
   font-size: calc(8px + 0.5vmin);
@@ -38,7 +49,7 @@ table.px-grid th {
 }
 tbody * {
   padding: 0 3px;
-  border: 1px solid #666;
+  border: 1px solid #000;
 }
 table th {
   font-size: xx-small;
@@ -80,3 +91,83 @@ table.px-grid td {
 table.px-grid td * {
   padding: 0;
 }
+table.dmx-grid td {
+  width: 3.5vmin;
+  height: 1vmin;
+}
+table.dmx-grid th {
+  background: #555;
+  color: #aaa;
+  width: 2.5em;
+}
+table caption {
+  background: #666;
+  color: #ccc;
+  text-transform: uppercase;
+  font-size: smaller;
+  letter-spacing: 0.75em;
+  padding: 0.25em;
+}
+table.ui-grid {
+  float: left;
+}
+form.command {
+  display: block;
+  clear: both;
+  margin: 1em;
+  padding: 1em 1em 0 0em;
+}
+form.command input {
+  width: 100%;
+  padding: 0.5em;
+  border: 1px solid #666;
+}
+.slider  {
+  width: 15em;
+  padding: 0.5em;
+  border: 1px solid #444;
+}
+.slider button  {
+  width: 20px;
+  height: 25px;
+  margin-left: 2px;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  border: 1px solid #666;
+  
+}
+.slider .inc {
+  background-color: #aaa;
+  mask-image: url('/assets/caret-right.svg');
+}
+.slider .dec {
+  background-color: #aaa;
+  mask-image: url('/assets/caret-left.svg');
+}
+.slider button[class]:hover {
+  background-color: #eee;
+}
+.slider span {
+  display: inline-block;
+  width: 8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+}
+.toggle {
+  border: 1px solid #face17;
+  padding: 0.5em;
+}
+.toggle.true {
+  background-color: #742;
+}
+
+.dmx-grid td[class] { background-color: #444; }
+.dmx-grid td[class].white { border-top-color: #ddd; }
+.dmx-grid td[class].amber { border-top-color: #FFCC66; }
+.dmx-grid td[class].uv    { border-top-color: #9000FF; }
+.dmx-grid td[class].green { border-top-color: green; }
+.dmx-grid td[class].red   { border-top-color: red; }
+.dmx-grid td[class].blue  { border-top-color: #3399ff; }
+.dmx-grid td[class].dimmer{ background-color: #666; }
+.dmx-grid td[class].from  { border-left-color: #ddd; }

@@ -1,14 +1,14 @@
 import { Component } from 'inferno';
 
-const COLS = 16
-const ROWS = 16
+const COLS = 8
+const ROWS = 8
 
 const rows = [...Array(ROWS).keys()]
 const cols = [...Array(COLS).keys()]
 
 class Grid extends Component {
   state = {
-    focus: {r: 0, c: 0}
+    focus: {r: -1, c: -1}
   }
   focused = (x, y) => {
     const {r, c} = this.state.focus
@@ -65,7 +65,7 @@ class Grid extends Component {
     e.preventDefault()
     const { target } = e
     if(target.tagName === 'TD') {
-      const c = target.cellIndex - 1 //for the TH!!!
+      const c = target.cellIndex  //for the TH!!!
       const r = target.parentElement.rowIndex
       this.setState({focus: {r, c}})
       const { exec } = this.props
@@ -74,13 +74,14 @@ class Grid extends Component {
     window.focus(e.target)
   }
   render() {
-    const { renderItem } = this.props
+    const { caption, renderItem } = this.props
     return (
       <table tabIndex="0" className='ui-grid' onKeyDown={this.handleKey} onClick={this.handleClick} onSelectStart={e => e.preventDefault()}>
+        {caption && <caption>{caption}</caption>}
         <tbody>
           {rows.map(r => (
             <tr>
-              <th>{1+r*16}</th>
+              
               {cols.map(c => (
                 <td {...this.focused(r,c)} >{renderItem(r,c)}</td>
               ))}
