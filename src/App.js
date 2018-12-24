@@ -64,18 +64,25 @@ class App extends Component {
   execPreset = (r, c) => {
     const { presets } = this.state
     const preset = presets[r*8+c]
-    console.log("Handling", preset)
     preset && requestAnimationFrame(() => socket.emit('update', preset.values))
   }
 
   renderHead = (r, c) => {
-    const { devices } = this.state
-    return devices && devices[r*8+c] ? devices[r*8+c].name : null
+    const { active, devices } = this.state
+    const d = devices && devices[r*8+c]
+    if(d) {
+      const a = active && active.head && active.head.id === d.id
+      console.log("Active", a)
+      return d && a ? <b>{d.name}</b> : d.name
+    } else {
+      return null
+    }
   }
 
   execHead = (r, c) => {
     const { devices } = this.state
-    this.setState({active: {...this.state.active, head: devices[r*8+c]}})
+    const head = devices[r*8+c]
+    this.setState({active: {...this.state.active, head}})
   }
 
 
@@ -117,6 +124,14 @@ class App extends Component {
       }
     } 
   }
+  stepper = channel => {
+    if (Array.isArray(channel)) {
+    } else {
+      const oldVal = 1*this.state.dmx[channel] || 0
+      const newVal = oldVal < 255 ? oldVal < 127 ? 127 : 255 : 0
+      socket.emit('update', {[channel]: newVal})
+    }
+  }
 
   renderSlider = (channel, label) => <ChannelSlider 
     key={channel}
@@ -124,6 +139,7 @@ class App extends Component {
     value={this.getOne(channel) || 0} 
     inc={this.inc.bind(this, channel, 1)} 
     dec={this.inc.bind(this, channel, -1)}
+    exec={this.stepper.bind(this, channel)}
   />
 
   toggleDMX = () => {
@@ -131,13 +147,25 @@ class App extends Component {
     this.setState({visible: {...visible, dmx: !visible.dmx}})
   }
 
+  toggle = what => {
+    const { visible } = this.state
+    const v = visible && visible[what]
+    this.setState({visible: {...visible, [what]: !v}})
+  }
+  renderToggle = (label, what) =>
+    <button 
+      className={`toggle ${this.state.visible[what]}`} 
+      onClick={this.toggle.bind(this, what)}>
+      {label}
+    </button>
+
   render() {
     const { active, visible, profiles, patched } = this.state
     return (
       <div className="App" >
         <header>
           <span className="title">Ze Desk</span>
-          <button className={`toggle ${visible.dmx}`} onClick={this.toggleDMX}>DMX</button>
+          {this.renderToggle('DMX', 'dmx')}
           <BigClock />
         </header>
         <Grid caption='Presets' renderItem={this.renderPreset} exec={this.execPreset} />

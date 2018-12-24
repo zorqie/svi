@@ -11,12 +11,19 @@ export default class ChannelSlider extends Component {
 			dec(e)
 	}
 	render() {
-		const { label, value, inc, dec } = this.props
+		const { label, value, inc, dec, exec } = this.props
 		return (
 			<div className="slider">
 				<span>{label}</span>
 				<button onMouseDown={dec} className="dec">&nbsp;</button>
-				<button onMouseWheel={this.handleWheel} onWheel={this.handleWheel} style={{width: '4em', textAlign: 'right'}}>{value}</button>
+				<button 
+					onMouseWheel={this.handleWheel} 
+					onWheel={this.handleWheel} 
+					onClick={exec}
+					style={{width: '4em', textAlign: 'right'}}
+				>
+					{value}
+				</button>
 				<button onMouseDown={inc} className="inc">&nbsp;</button>
 			</div>
 		)

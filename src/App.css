@@ -59,6 +59,7 @@ table td {
   width: 6.5vmin;
   max-width: 6.75vmin;
   height: 6vmin;
+  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
 }

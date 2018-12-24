@@ -65,7 +65,7 @@ class Grid extends Component {
     e.preventDefault()
     const { target } = e
     if(target.tagName === 'TD') {
-      const c = target.cellIndex  //for the TH!!!
+      const c = target.cellIndex
       const r = target.parentElement.rowIndex
       this.setState({focus: {r, c}})
       const { exec } = this.props
@@ -81,7 +81,6 @@ class Grid extends Component {
         <tbody>
           {rows.map(r => (
             <tr>
-              
               {cols.map(c => (
                 <td {...this.focused(r,c)} >{renderItem(r,c)}</td>
               ))}
@@ -89,7 +88,7 @@ class Grid extends Component {
           ) )}
         </tbody>
       </table>
-    );
+    )
   }
 }
 
