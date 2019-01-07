@@ -10,7 +10,7 @@ import CueGrid from './ui/cue-grid'
 import Grid from './ui/grid'
 import Programmer from './ui/programmer'
 import ProgrammerView from './ui/programmer-view'
-import ProfileControl from './ui/pro-control'
+import ProfileControl from './ui/profile-control'
 import { Question } from './ui/dialogs'
 import UniverseOut from './ui/universe-out'
 
