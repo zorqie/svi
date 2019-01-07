@@ -1,6 +1,6 @@
 import { Component } from 'inferno'
 
-import CueView from './cue-view'
+import CueTable from './cue-table'
 import Grid from './grid'
 
 export default class CueGrid extends Component {
@@ -70,7 +70,7 @@ export default class CueGrid extends Component {
 		return (
 			<div>
 				<Grid caption="Cues" renderItem={this.renderCue} exec={this.execCue} />
-				{cue && <CueView cue={cue} heads={heads} patched={patched} />}
+				{cue && <CueTable cue={cue} heads={heads} patched={patched} />}
 			</div>
 		)
 	}

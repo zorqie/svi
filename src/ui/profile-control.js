@@ -30,10 +30,11 @@ const group = channels => {
 */
 export default class ProfileControl extends Component {
 	render() {
-		const { profile, address, renderChannel } = this.props
+		const { caption, profile, address, renderChannel } = this.props
 		return profile && (
 			<div className="profile">
-				{profile.channels.map((ch, i) => renderChannel(address+i, ch))}
+				<div>{caption}</div>
+				{profile.channels.map((ch, i) => renderChannel(address+i, ch, profile.ranges[ch]))}
 			</div>
 		)
 	}

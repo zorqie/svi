@@ -7,11 +7,10 @@ import BigClock from './ui/big-clock'
 import ChannelSlider from './ui/channel-slider'
 // import CommandLine from './ui/command-line'
 import CueGrid from './ui/cue-grid'
-import CueView from './ui/cue-view'
 import Grid from './ui/grid'
 import Programmer from './ui/programmer'
 import ProgrammerView from './ui/programmer-view'
-import ProfileControl from './ui/profile-control'
+import ProfileControl from './ui/pro-control'
 import { Question } from './ui/dialogs'
 import UniverseOut from './ui/universe-out'
 
@@ -203,8 +202,7 @@ class App extends Component {
     this.setState({active: {...this.state.active, head}})
   }
 
-
-  getOne(channel) {
+  getOne = (channel) => {
     if (Array.isArray(channel)) {
       const val = this.state.dmx[channel[0]]
       var same = true
@@ -220,52 +218,9 @@ class App extends Component {
     }
   }
 
-  inc(channel, delta, e) {
-    console.log("Incing", channel, delta)
-    const d = e && e.shiftKey ? 10 : 1
-    if (Array.isArray(channel)) {
-      const u = {}
-      for(var c=0; c < channel.length; c++) {
-        const oldVal = 1*this.state.dmx[channel[c]] || 0
-        const newVal = dmx(oldVal + d * delta)
-        if(oldVal !== newVal) {
-          u[channel[c]] = newVal
-        }
-      }
-      // cpu.update(u)
-      // socket.emit('update', u)
-      socket.emit('execute', u)
-    } else {
-      const oldVal = 1*this.state.dmx[channel] || 0
-      var newVal = dmx(oldVal + d * delta)
-      if(oldVal !== newVal) {
-        const u = {}
-        u[channel] = newVal
-        // cpu.update(u)
-        // socket.emit('update', u)
-        socket.emit('execute', u)
-      }
-    } 
+  execUpdate(u) {
+    socket.emit('execute', u)
   }
-  stepper = channel => {
-    if (Array.isArray(channel)) {
-    } else {
-      const oldVal = 1*this.state.dmx[channel] || 0
-      const newVal = oldVal < 255 ? oldVal < 127 ? 127 : 255 : 0
-      // cpu.update({[channel]: newVal})
-      // socket.emit('update', {[channel]: newVal})
-      socket.emit('execute', {[channel]: newVal})
-    }
-  }
-
-  renderSlider = (channel, label) => <ChannelSlider 
-    key={channel}
-    label={label}
-    value={this.getOne(channel) || 0} 
-    inc={this.inc.bind(this, channel, 1)} 
-    dec={this.inc.bind(this, channel, -1)}
-    exec={this.stepper.bind(this, channel)}
-  />
 
   toggle = what => {
     const { visible } = this.state
@@ -277,8 +232,7 @@ class App extends Component {
       className={`toggle ${this.state.visible[what]}`} 
       onClick={this.toggle.bind(this, what)}
       onFocus={e=>e.target.blur()}
-      >
-
+    >
       {label}
     </button>
 
@@ -301,15 +255,16 @@ class App extends Component {
           <BigClock />
         </header>
         {visible.cue && <CueGrid cues={this.state.cues} active={active} cpu={cpu} socket={socket} heads={heads} patched={patched} />}
-        {/*visible.pgm && <CueView cue={this.state.programCue} heads={this.state.heads} patched={patched} />*/}
         {visible.pgm && <ProgrammerView cueId='programCue' socket={socket} heads={heads} patched={patched} />}
         {visible.pre && <Grid key='presets' caption='Presets' renderItem={this.renderCue} exec={this.execCue}/>}
         {visible.grp && <Grid key='heads' caption='Heads' renderItem={this.renderHead} exec={this.execHead} />}
         {active.head 
           && <ProfileControl 
+            caption={active.head.name}
             profile={profiles[active.head.type]} 
             address={active.head.address}
-            renderChannel={this.renderSlider}
+            getDmx={this.getOne}
+            exec={this.execUpdate}
             />
         }
         <div className='status'>

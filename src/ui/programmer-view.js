@@ -1,6 +1,6 @@
 import { Component } from 'inferno'
 
-import CueView from './cue-view'
+import CueTable from './cue-table'
 
 export default class ProgrammerView extends Component {
 	state = {cue: null}
@@ -26,7 +26,7 @@ export default class ProgrammerView extends Component {
 		const { socket, ...others } = this.props
 		const { cue } = this.state
 		return (
-			cue && <CueView cue={cue} {...others} />
+			cue && <CueTable cue={cue} {...others} />
 		)
 	}
 }

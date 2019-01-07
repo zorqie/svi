@@ -2,24 +2,20 @@ import { Component, Fragment } from 'inferno'
 
 const CueValue = ({val}) => {
 	if(typeof val === 'object') {
-		return <dd>
-			<b>{val.to}</b>
-			<b>fade: {val.fade}</b>
-			<b>{val.delay ? 'delay: ' + val.delay : ' '}</b>
-		</dd>
+		return <Fragment>
+			<td>{val.to}</td>
+			<td>{val.fade || ''}</td>
+			<td>{val.delay || ''}</td>
+		</Fragment>
 	} else {
-		return <dd><b>{val}</b></dd>
+		return <Fragment><td>{val}</td><td></td><td></td></Fragment>
 	}
 }
 
 const CueHeader = ({heads, patched, ch}) => {
 	const ph = patched && patched[ch]
 	const h = ph && heads.find(e => e.id===ph.head) //TODO include head name in patched
-	// if(h) {
-		return <dt>{h && h.name} {ph && ph.type} <span>{ch}</span></dt>
-	// } else {
-		// return <dt><span>{ch}</span></dt>
-	// }
+	return <th><b>{h && h.name}</b> {ph && ph.type} <span>{ch}</span></th>
 }
 
 export default class CueView extends Component {
@@ -35,17 +31,25 @@ export default class CueView extends Component {
 		const { cue, ...others } = this.props
 		console.log("CUE>", cue)
 		return (
-			<div className="cue">
-				<h3>Cue {cue.label || cue.id}</h3>
-				<dl className="cue">
+			<table className="cue">
+				<caption>Cue <b>{cue.label || cue.id}</b></caption>
+				<thead>
+					<tr>
+						<th>Head <span>Ch</span></th>
+						<td>Val</td>
+						<td>Fade</td>
+						<td>Dlay</td>
+					</tr>
+				</thead>
+				<tbody>
 				{Object.keys(cue.values).map(v => 
-					<Fragment key={v}>
+					<tr key={v}>
 						<CueHeader {...others} ch={v} />
 						<CueValue val={cue.values[v]} />
-					</Fragment>
+					</tr>
 				)}
-				</dl>
-			</div>
+				</tbody>
+			</table>
 		)
 	}
 }
