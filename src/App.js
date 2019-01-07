@@ -221,6 +221,7 @@ class App extends Component {
   }
 
   inc(channel, delta, e) {
+    console.log("Incing", channel, delta)
     const d = e && e.shiftKey ? 10 : 1
     if (Array.isArray(channel)) {
       const u = {}
@@ -233,7 +234,7 @@ class App extends Component {
       }
       // cpu.update(u)
       // socket.emit('update', u)
-      socket.emit('exec', u)
+      socket.emit('execute', u)
     } else {
       const oldVal = 1*this.state.dmx[channel] || 0
       var newVal = dmx(oldVal + d * delta)
@@ -242,7 +243,7 @@ class App extends Component {
         u[channel] = newVal
         // cpu.update(u)
         // socket.emit('update', u)
-        socket.emit('exec', u)
+        socket.emit('execute', u)
       }
     } 
   }
@@ -253,7 +254,7 @@ class App extends Component {
       const newVal = oldVal < 255 ? oldVal < 127 ? 127 : 255 : 0
       // cpu.update({[channel]: newVal})
       // socket.emit('update', {[channel]: newVal})
-      socket.emit('exec', {[channel]: newVal})
+      socket.emit('execute', {[channel]: newVal})
     }
   }
 
@@ -304,10 +305,6 @@ class App extends Component {
         {visible.pgm && <ProgrammerView cueId='programCue' socket={socket} heads={heads} patched={patched} />}
         {visible.pre && <Grid key='presets' caption='Presets' renderItem={this.renderCue} exec={this.execCue}/>}
         {visible.grp && <Grid key='heads' caption='Heads' renderItem={this.renderHead} exec={this.execHead} />}
-        <div className='status'>
-          <input value={this.state.status} disabled />
-        </div>
-        <Programmer cpu={cpu} {...this.state.cpu}/>
         {active.head 
           && <ProfileControl 
             profile={profiles[active.head.type]} 
@@ -315,6 +312,10 @@ class App extends Component {
             renderChannel={this.renderSlider}
             />
         }
+        <div className='status'>
+          <input value={this.state.status} disabled />
+        </div>
+        <Programmer cpu={cpu} {...this.state.cpu}/>
         {visible.dmx && <UniverseOut patched={patched}/>}
         <footer>{`On Inferno ${version}`}</footer>
         <Question {...question} />

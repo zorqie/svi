@@ -222,6 +222,10 @@ div.status input {
 .buttons .primary {
   border-color: #842;
 }
+.profile {
+  float: left;
+  white-space: nowrap;
+}
 .cue {
   display: block;
   clear: both;
