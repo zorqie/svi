@@ -17,6 +17,9 @@ export default class Programmer extends Component {
 	handleSubmit = e => {
 		e.preventDefault()
 		const { command } = this.state
+		if(command === '') {
+			return
+		}
 		const { cpu, set, rec } = this.props
 		if(set === 'started') {
 			cpu.emit('cpu', 'command', command)
@@ -35,15 +38,9 @@ export default class Programmer extends Component {
 		const { cpu, rec, set } = this.props
 		const { command } = this.state
 		const empty = cpu && cpu.isEmpty() 
-		// const rec = cpu && cpu.isRecording()
 
-		// console.log("Rec: ", rec)
 		return (
 			<div id="programmer">
-{/*
-				<button id="include">Inc</button>
-				<button id="update">Upd</button>
-*/}
 				<form onSubmit={this.handleSubmit} className='command'> 
 					<input
 						value={command}

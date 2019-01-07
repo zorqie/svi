@@ -49,6 +49,7 @@ class App extends Component {
       console.log("WARN", message, what)
       this.setState({status: message})
     })
+    document.addEventListener('keydown', this.presser)
   }
 
   componentWillUnmount() {
@@ -56,6 +57,26 @@ class App extends Component {
     socket.removeListener('update', this.receiveUpdate)
     socket.removeListener('question', this.receiveQuestion)
     socket.removeListener('executed', this.receiveExec)
+    document.removeEvemtListener('keydown', this.presser)
+  }
+
+  // TODO move this to dialogs. No need to listen all the time
+  presser = e => {
+    const { question } = this.state
+    if(question && question.message) {
+      switch(e.key) {
+        case 'Enter':
+          console.log("Confirm")
+          question.onOk()
+          break;
+        case 'Escape':
+          console.log("Cancel")
+          question.onCancel()
+          break
+        default:
+          // no-op
+      }
+    }
   }
 
   init = msg => {

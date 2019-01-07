@@ -1,12 +1,11 @@
 import { Component } from 'inferno'
 
-let tickTimer
-function time() {
+let ticker
+function time(seconds=true) {
 	const date = new Date()
-	var h = date.getHours() // 0 - 23
-	var m = date.getMinutes() // 0 - 59
-	var s = date.getSeconds() // 0 - 59
-	var session = "a"
+	let h = date.getHours() // 0 - 23
+	let m = date.getMinutes() // 0 - 59
+	let session = "a"
 	
 	if(h === 0) {
 		h = 12
@@ -15,29 +14,38 @@ function time() {
 		session = "p"
 	}
 	
-	h = (h < 10) ? "0" + h : h
+	// h = (h < 10) ? "0" + h : h
 	m = (m < 10) ? "0" + m : m
-	s = (s < 10) ? "0" + s : s
+	var time = h + ":" + m 
+	if(seconds) {
+		let s = date.getSeconds() // 0 - 59
+		s = (s < 10) ? "0" + s : s
+		time += ":" + s 
+	}
 	
-	var time = h + ":" + m + ":" + s + session
-	return time
+	return time + session
 }
 
 export default class BigClock extends Component {
+	state = {seconds: true}
+
 	componentDidMount() {
-		tickTimer = setInterval(() => { this.forceUpdate() }, 1000)
+		ticker = setInterval(() => { this.forceUpdate() }, 1000)
 	}
 
 	componentWillUnmount() {
-		if (tickTimer) {
-			clearInterval(tickTimer) 
+		if (ticker) {
+			clearInterval(ticker) 
 		}
 	}
 	
+	toggleSeconds = () => this.setState({seconds: !this.state.seconds})
+
 	render() {
+		const { seconds } = this.state
 		return (
-			<span id="BigClock">
-				{time()}
+			<span id="BigClock" onClick={this.toggleSeconds}>
+				{time(seconds)}
 			</span>
 		)
 	}
