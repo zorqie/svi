@@ -75,6 +75,7 @@ class Grid extends Component {
   }
   render() {
     const { caption, renderItem } = this.props
+    // console.log("Caption", caption)
     return (
       <table tabIndex="0" className='ui-grid' onKeyDown={this.handleKey} onClick={this.handleClick} onSelectStart={e => e.preventDefault()}>
         {caption && <caption>{caption}</caption>}

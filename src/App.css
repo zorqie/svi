@@ -1,27 +1,31 @@
 html * {
-  background-color: #222;
-  color: #eee;
+  background-color: #111;
+  color: #ccc;
   font-family: 'B612 Mono';
   font-size: calc(8px + 0.75vmin);
   line-height: 1.2;
   margin:0; padding:0;
+  vertical-align: baseline;
 }
 html *:focus {
-  outline: 2px solid #9cf;
+  outline: 2px solid #69c;
 }
 button, input {
-  border: 1px solid blue;
+  border: 1px solid #008;
 }
 header {
   height: 3em;
 }
 header .title {
-  background: #666;
+  background: #464;
   color: #000;
   padding: 0.5em;
   font-size: 20px;
   font-weight: bold;
   float: left;
+}
+header .title.false {
+  background: #c44
 }
 header #BigClock {
   font-size: 24px;
@@ -75,10 +79,10 @@ table td * {
   font-weight: normal;
 }
 table td.focus * {
-  background-color: rgba(255,128,0,0.75);
+  background-color: rgba(255,128,0,0.55);
   justify-content: center;
 }
-table.ui-grid td:hover, table.px-grid td:hover {
+table.ui-grid td:hover, table.px-grid td:hover, button:hover, button.primary:hover {
   border-color: #aaa;
 }
 table.px-grid td {
@@ -123,6 +127,17 @@ form.command input {
   padding: 0.5em;
   border: 1px solid #666;
 }
+div.status {
+  display: block;
+  clear: both;
+  margin: 1em 1em -1em 1em;
+  padding: 1em 1em 0 0em;
+}
+div.status input {
+  width: 100%;
+  padding: 0 0.5em;
+  margin-bottom: -14px;
+}
 .slider  {
   width: 15em;
   padding: 0.5em;
@@ -156,11 +171,11 @@ form.command input {
   text-transform: capitalize;
 }
 .toggle {
-  border: 1px solid #face17;
-  padding: 0.5em;
+  border: 1px solid #842;
+  padding: 0.7em;
 }
 .toggle.true {
-  background-color: #742;
+  background-color: #842;
 }
 
 .dmx-grid td[class] { background-color: #444; }
@@ -172,3 +187,74 @@ form.command input {
 .dmx-grid td[class].blue  { border-top-color: #3399ff; }
 .dmx-grid td[class].dimmer{ background-color: #666; }
 .dmx-grid td[class].from  { border-left-color: #ddd; }
+
+#programmer button {
+  padding: 0.5em 0.5em 0.2em 0.5em;
+  margin: 2px;
+  text-transform: uppercase;
+  border-bottom-width: 3px;
+}
+#programmer button.true,
+#programmer button.started {
+  border-bottom-color: #c42;
+}
+.dialog {
+  position: absolute;
+  top: 33%;
+  left: 50%;
+  width: 60em;
+  margin-left: -30em;
+  height: 10em;
+  border: 2px solid #842;
+}
+.dialog p {
+  margin: 2em;
+}
+.dialog .buttons {
+  text-align: center;
+  position: relative;
+  bottom: 0;
+}
+.buttons button {
+  margin: 0 1em;
+  padding: 1em 1.5em 0.9em 1.5em;
+}
+.buttons .primary {
+  border-color: #842;
+}
+.cue {
+  display: block;
+  clear: both;
+}
+.cue>* {
+  margin: 2px;
+}
+.cue h3 {
+  padding: 3px;
+  border-bottom: 1px solid #444;
+}
+dl.cue dt {
+  width: 14em;
+  float: left;
+  clear: both;
+}
+dl.cue dt span {
+  float: right;
+  display: inline-block;
+  width: 2.5em;
+  border: 1px solid #444;
+  margin: 0 2px;
+  text-align: right;
+  color: #999;
+}
+dl.cue dd {
+  float: left;
+}
+dl.cue dd>* {
+  display: inline-block;
+  background: #842;
+  border: 1px solid #842;
+  min-width: 2.5em;
+  margin: 0 2px;
+  text-align: right;
+}
