@@ -7,14 +7,26 @@ export default class ProgrammerView extends Component {
 	componentDidMount() {
 		const { cueId, socket } = this.props
 		socket.on('state', this.receive)
+		socket.on('released', this.requestState)
+		socket.on('executed', this.requestState)
 		socket.emit('get', cueId)
 		console.log("Monty", cueId)
 	}
 
+
 	componentWillUnmount() {
 		const { socket } = this.props
 		socket.removeListener('state', this.receive)
+		socket.removeListener('released', this.requestState)
+		socket.removeListener('executed', this.requestState)
 		console.log("Dismonty")
+	}
+
+	requestState = (item, cue) => { 
+		const { cueId, socket } = this.props
+		if (cue === cueId) {
+			socket.emit('get', cueId)
+		}
 	}
 
 	receive = cue => {
@@ -22,11 +34,19 @@ export default class ProgrammerView extends Component {
 		this.setState({cue})
 	}
 
+	handleClick = (what, e) => {
+		const { cueId, socket } = this.props
+		if(e.ctrlKey) {
+			socket.emit('release', what, cueId)
+		}
+		console.log("Clacked", what, e)
+	}
+
 	render() {
 		const { socket, ...others } = this.props
 		const { cue } = this.state
 		return (
-			cue && <CueTable cue={cue} {...others} />
+			cue && <CueTable cue={cue} {...others} onClick={this.handleClick}/>
 		)
 	}
 }

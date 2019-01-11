@@ -45,12 +45,12 @@ export default class CueGrid extends Component {
 			} else {
 				if(ctrlKey) {
 					console.log("Releasing", cue)
-					socket.emit('release', cue, 'programmer')
+					socket.emit('release', cue, 'programCue')
 				} else if(altKey) {
 					this.setState({cue})
 				} else {
 					console.log("Executing", cue)
-					socket.emit('execute', cue, 'programmer')
+					socket.emit('execute', cue, 'programCue')
 				}
 			}
 		} else {

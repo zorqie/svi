@@ -1,5 +1,6 @@
 import { Component } from 'inferno'
 
+// TODO ranges is misnomer
 const option = (ranges, value) => {
 	if(ranges && ranges.options) {
 		for(let o in ranges.options) {

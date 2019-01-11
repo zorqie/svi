@@ -89,6 +89,14 @@ button:hover,
 button.primary:hover {
   border-color: #aaa;
 }
+.App.on table.ui-grid td:not(:empty):hover, 
+.App.locked table.ui-grid td:hover, 
+.App.on table.cue tr:hover th,
+.App.on table.cue td:not(:empty):hover, 
+.App.locked table.cue td:hover {
+  border-color: #f64;
+}
+
 table.px-grid td {
   width: 3.75vmin;
   max-width: 3.75vmin;
@@ -195,12 +203,16 @@ div.status input {
 .dmx-grid td[class].dimmer{ background-color: #666; }
 .dmx-grid td[class].from  { border-left-color: #ddd; }
 
-#programmer button {
+#programmer button, button.lock {
   padding: 0.5em 0.5em 0.2em 0.5em;
   margin: 2px;
   text-transform: uppercase;
   border-bottom-width: 3px;
 }
+button.lock.locked {
+  background: #820;
+}
+button.lock.on,
 #programmer button.true,
 #programmer button.started {
   border-bottom-color: #c42;
@@ -317,4 +329,9 @@ table.cue thead * {
   padding: 0.25em 0.5em;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+#locks {
+  position: fixed;
+  right: 0;
+  width: 4.5vw;
 }

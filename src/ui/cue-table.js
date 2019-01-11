@@ -28,10 +28,10 @@ export default class CueView extends Component {
 	}
 
 	render() {
-		const { cue, ...others } = this.props
+		const { cue, onClick=()=>{}, ...others } = this.props
 		console.log("CUE>", cue)
 		return (
-			<table className="cue">
+			<table className="cue" {...others}>
 				<caption>Cue <b>{cue.label || cue.id}</b></caption>
 				<thead>
 					<tr>
@@ -43,7 +43,7 @@ export default class CueView extends Component {
 				</thead>
 				<tbody>
 				{Object.keys(cue.values).map(v => 
-					<tr key={v}>
+					<tr key={v} onClick={onClick.bind(null, {[v]:cue.values[v]})}>
 						<CueHeader {...others} ch={v} />
 						<CueValue val={cue.values[v]} />
 					</tr>

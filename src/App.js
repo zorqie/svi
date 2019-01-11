@@ -4,7 +4,7 @@ import './App.css';
 import io from 'socket.io-client'
 
 import BigClock from './ui/big-clock'
-import ChannelSlider from './ui/channel-slider'
+// import ChannelSlider from './ui/channel-slider'
 // import CommandLine from './ui/command-line'
 import CueGrid from './ui/cue-grid'
 import Grid from './ui/grid'
@@ -18,7 +18,7 @@ import CPU from './cpu'
 
 const socket = io('http://localhost:8080')
 
-const dmx = val => val > 255 ? 255 : val < 0 ? 0 : val
+// const dmx = val => val > 255 ? 255 : val < 0 ? 0 : val
 
 const cpu = new CPU() // BAAD
 
@@ -30,6 +30,12 @@ class App extends Component {
       dmx: {},
       active: {},
       visible: {},
+      locks: {
+        rel: 'off',
+        set: 'off',
+        inc: 'off',
+        rec: 'off',
+      },
       cpu: {},
       status: '',
     }
@@ -49,6 +55,7 @@ class App extends Component {
       this.setState({status: message})
     })
     document.addEventListener('keydown', this.presser)
+    document.addEventListener('keyup', this.keyup)
   }
 
   componentWillUnmount() {
@@ -57,11 +64,19 @@ class App extends Component {
     socket.removeListener('question', this.receiveQuestion)
     socket.removeListener('executed', this.receiveExec)
     document.removeEvemtListener('keydown', this.presser)
+    document.removeEvemtListener('keyup', this.keyup)
   }
 
+  keyup = e => e.key==='Control' && this.setState({locks: {...this.state.locks, rel:'off'}})
   // TODO move this to dialogs. No need to listen all the time
   presser = e => {
     const { question } = this.state
+    if(e.key==='Control') {
+      const { rel } = this.state.locks
+      if(rel !== 'on') {
+        this.setState({locks: {...this.state.locks, rel:'on'}})
+      }
+    }
     if(question && question.message) {
       switch(e.key) {
         case 'Enter':
@@ -127,6 +142,9 @@ class App extends Component {
   receiveExec = (what, target) => {
     console.log("EXECUTED.", what, target)
   }
+  execUpdate(u) {
+    socket.emit('execute', u)
+  }
 
   setRecStatus = status => {
     this.setState({rec: status, status})
@@ -134,55 +152,6 @@ class App extends Component {
   setCpuStatus = (which, status) => {
     const msg = `${which} ${status}`
     this.setState({cpu:{...this.state.cpu, [which]: status}, status: msg})
-  }
-
-  renderCue = (r, c) => {
-    const { active, cues } = this.state
-    const p = cues && cues[r*8+c]
-    if(p) {
-      const a = active && active.cue && active.cue.id === p.id
-      return a ? <b>{p.label}</b> : p.label
-    } else {
-      return null
-    }
-  }
-
-  execCue = (r, c) => {
-    const { cues } = this.state
-    const { rec, set } = this.state.cpu
-    const index = r*8+c
-    const cue = cues[index]
-    if(cue) {
-      if(rec === 'started') {
-        const nueCue = cpu.getPreset(cue)
-        const question = {
-          message: `Overwrite cue '${cue.label}'`,
-          onCancel: e => { this.setState({question: {}})},
-          onOk: e => {
-            socket.emit('cue', nueCue, 'update')
-            cpu.endRec('successful. Updated cue ' + cue.label)
-            this.setState({question: {}})
-          }
-        }
-        this.setState({question})
-      } else if(set === 'started') {
-        console.log("setting.", cue.id)        
-      } else {
-        console.log("Executing", cue)
-        cpu.include(cue)
-        this.setState({active: {...this.state.active, cue}})
-        requestAnimationFrame(() => socket.emit('update', cue.values))
-      }
-    } else {
-      if(rec === 'started') {
-        const nueCue = cpu.getPreset({id: 'p'+index, label: 'p'+index})
-        cues[index] = nueCue
-        socket.emit('cue', nueCue, 'add')
-        cpu.endRec('successful. Created cue ' + nueCue.label)
-        // requestAnimationFrame(() => this.setState({cues}))
-      }
-    }
-    
   }
 
   renderHead = (r, c) => {
@@ -218,9 +187,20 @@ class App extends Component {
     }
   }
 
-  execUpdate(u) {
-    socket.emit('execute', u)
+  lock = (what, e) => {
+    const { locks } = this.state
+    const last = locks && locks[what] === 'off'
+    const on = last ? e.shiftKey ? 'locked' : 'on' : 'off'
+    this.setState({locks: {...locks, [what]: on}})
   }
+  Lock = ({label, what, style, ...others}) => 
+    <button 
+      className={`lock ${what} ${this.state.locks[what]||''}`}
+      onClick={this.lock.bind(this, what)}
+      onFocus={e=>e.target.blur()}
+    >
+      {label || what}
+    </button>
 
   toggle = what => {
     const { visible } = this.state
@@ -237,26 +217,28 @@ class App extends Component {
     </button>
 
   render() {
-    const { active, connected, heads, question, visible, profiles, patched } = this.state
+    const { active, connected, heads, locks, visible, profiles, patched } = this.state
     // console.log("Active", active)
     return (
-      <div className="App" >
+      <div className={`App ${locks.rel}`} >
         <header>
           <span className={`title ${connected}`}>Ze Desk</span>
           {this.renderToggle('DMX', 'dmx')}
           {this.renderToggle('PGM', 'pgm')}
 
           <span>
-            &nbsp;Grid:
             {this.renderToggle('CUES', 'cue')}
-            {this.renderToggle('PRES', 'pre')} 
             {this.renderToggle('HEAD', 'grp')}
           </span>
           <BigClock />
         </header>
+        <div id="locks">
+          <this.Lock what='rel' />
+          <this.Lock what='set' />
+          <this.Lock what='rec' />
+        </div>
         {visible.cue && <CueGrid cues={this.state.cues} active={active} cpu={cpu} socket={socket} heads={heads} patched={patched} />}
         {visible.pgm && <ProgrammerView cueId='programCue' socket={socket} heads={heads} patched={patched} />}
-        {visible.pre && <Grid key='presets' caption='Presets' renderItem={this.renderCue} exec={this.execCue}/>}
         {visible.grp && <Grid key='heads' caption='Heads' renderItem={this.renderHead} exec={this.execHead} />}
         {active.head 
           && <ProfileControl 
@@ -273,7 +255,7 @@ class App extends Component {
         <Programmer cpu={cpu} {...this.state.cpu}/>
         {visible.dmx && <UniverseOut patched={patched}/>}
         <footer>{`On Inferno ${version}`}</footer>
-        <Question {...question} />
+        <Question {...this.state.question} />
       </div>
     )
   }
