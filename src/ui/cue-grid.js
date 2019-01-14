@@ -18,10 +18,11 @@ export default class CueGrid extends Component {
 	cueListener = (cue, action, result) => console.log(action, " cue:", cue, "->", result)
 
 	renderCue = (r, c) => {
-		const { active, cues } = this.props
+		const { active, cues, pgm } = this.props
 		const p = cues && cues[r*8+c]
 		if (p) {
-			const a = active && active.cue && active.cue.id === p.id
+			// const a = active && active.cue && active.cue.id === p.id
+			const a = pgm && pgm.cues[p.id] !== undefined
 			return a ? <b>{p.label}</b> : p.label
 		} else {
 			return null
@@ -29,37 +30,34 @@ export default class CueGrid extends Component {
 	}
 
 	execCue = (r, c, e) => {
-		const { cpu, cues, socket } = this.props
-		const { rec, set } = cpu
+		const { cues, socket, locks } = this.props
 		const { altKey, ctrlKey/*, shiftKey*/ } = e
 		const index = r*8+c
 		const cue = cues[index]
-		console.log("Exec'ing", cue, e)
+		console.log("Execing?", cue)
 		if(cue) {
-			if(rec === 'started') {
-				const nueCue = cpu.getPreset(cue)
-				socket.emit('cue', nueCue, 'update')
+			if(locks && locks.rec !== 'off') {
+				// const nueCue = cpu.getPreset(cue)
+				socket.emit('cue', cue, 'update')
 				
-			} else if(set === 'started') {
-				console.log("setting.", cue.id)        
 			} else {
-				if(ctrlKey) {
+				if(ctrlKey || (locks && locks.rel !== 'off') ) {
 					console.log("Releasing", cue)
-					socket.emit('release', cue, 'programCue')
+					socket.emit('release', cue, 'pgm')
 				} else if(altKey) {
 					this.setState({cue})
 				} else {
 					console.log("Executing", cue)
-					socket.emit('execute', cue, 'programCue')
+					socket.emit('execute', cue, 'pgm')
 				}
 			}
 		} else {
 			if(altKey) {
 				this.setState({cue})
 			}
-			if(rec === 'started') {
-				const nueCue = cpu.getPreset({id: 'p'+index, label: 'p'+index})
-				socket.emit('cue', nueCue, 'add')
+			if(locks && locks.rec !== 'off') {
+				// const nueCue = cpu.getPreset({id: 'p'+index, label: 'p'+index})
+				socket.emit('save', 'cue', 'add')
 			}
 		}
 	}

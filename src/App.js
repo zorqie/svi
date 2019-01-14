@@ -14,13 +14,13 @@ import ProfileControl from './ui/profile-control'
 import { Question } from './ui/dialogs'
 import UniverseOut from './ui/universe-out'
 
-import CPU from './cpu'
+// import CPU from './cpu'
 
 const socket = io('http://localhost:8080')
 
 // const dmx = val => val > 255 ? 255 : val < 0 ? 0 : val
 
-const cpu = new CPU() // BAAD
+// const cpu = new CPU() // BAAD
 
 class App extends Component {
   constructor() {
@@ -36,11 +36,11 @@ class App extends Component {
         inc: 'off',
         rec: 'off',
       },
-      cpu: {},
+      // cpu: {},
       status: '',
     }
-    cpu.on('cleared', () => this.setState({cleared: true, status: ''}))
-    cpu.on('cpu', this.setCpuStatus)
+    // cpu.on('cleared', () => this.setState({cleared: true, status: ''}))
+    // cpu.on('cpu', this.setCpuStatus)
   }
 
   componentDidMount() {
@@ -49,7 +49,11 @@ class App extends Component {
     socket.on('disconnect', () => this.setState({connected: false}))
     socket.on('connect', () => this.setState({connected: true}))
     socket.on('question', this.receiveQuestion)
-    socket.on('executed', this.receiveExec)
+
+    socket.on('executed', this.requestState)
+    socket.on('released', this.requestState)
+    socket.on('state', this.receiveState)
+
     socket.on('warn', (message, what) => {
       console.log("WARN", message, what)
       this.setState({status: message})
@@ -62,7 +66,9 @@ class App extends Component {
     socket.removeListener('init', this.init)
     socket.removeListener('update', this.receiveUpdate)
     socket.removeListener('question', this.receiveQuestion)
-    socket.removeListener('executed', this.receiveExec)
+    socket.removeListener('executed', this.requestState)
+    socket.removeListener('released', this.requestState)
+    socket.removeListener('state', this.receiveState)
     document.removeEvemtListener('keydown', this.presser)
     document.removeEvemtListener('keyup', this.keyup)
   }
@@ -108,6 +114,15 @@ class App extends Component {
     console.log("Initialized.", this)
   }
 
+  requestState = (item, cueName) => { 
+      socket.emit('get', cueName)
+  }
+
+  receiveState = cue => {
+    console.log("App got cue", cue)
+    this.setState({cue})
+  }
+
   receiveUpdate = u => {
     // console.time("receiveUpdate")
     const dmx = this.state.dmx
@@ -149,10 +164,10 @@ class App extends Component {
   setRecStatus = status => {
     this.setState({rec: status, status})
   }
-  setCpuStatus = (which, status) => {
-    const msg = `${which} ${status}`
-    this.setState({cpu:{...this.state.cpu, [which]: status}, status: msg})
-  }
+  // setCpuStatus = (which, status) => {
+  //   const msg = `${which} ${status}`
+  //   this.setState({cpu:{...this.state.cpu, [which]: status}, status: msg})
+  // }
 
   renderHead = (r, c) => {
     const { active, heads } = this.state
@@ -218,7 +233,7 @@ class App extends Component {
 
   render() {
     const { active, connected, heads, locks, visible, profiles, patched } = this.state
-    // console.log("Active", active)
+    console.log("\nCUE\n", this.state.cue)
     return (
       <div className={`App ${locks.rel}`} >
         <header>
@@ -237,9 +252,26 @@ class App extends Component {
           <this.Lock what='set' />
           <this.Lock what='rec' />
         </div>
-        {visible.cue && <CueGrid cues={this.state.cues} active={active} cpu={cpu} socket={socket} heads={heads} patched={patched} />}
-        {visible.pgm && <ProgrammerView cueId='programCue' socket={socket} heads={heads} patched={patched} />}
-        {visible.grp && <Grid key='heads' caption='Heads' renderItem={this.renderHead} exec={this.execHead} />}
+        {visible.cue 
+          && <CueGrid 
+            cues={this.state.cues} 
+            active={active} 
+            socket={socket} 
+            heads={heads} 
+            patched={patched} 
+            locks={locks}
+            pgm={this.state.cue}
+            />}
+        {visible.pgm 
+          && <ProgrammerView 
+                cueId='pgm' 
+                socket={socket} 
+                locks={locks}
+                heads={heads} 
+                patched={patched}
+              />}
+        {visible.grp 
+          && <Grid key='heads' caption='Heads' renderItem={this.renderHead} exec={this.execHead} />}
         {active.head 
           && <ProfileControl 
             caption={active.head.name}
@@ -252,7 +284,7 @@ class App extends Component {
         <div className='status'>
           <input value={this.state.status} disabled />
         </div>
-        <Programmer cpu={cpu} {...this.state.cpu}/>
+        <Programmer />
         {visible.dmx && <UniverseOut patched={patched}/>}
         <footer>{`On Inferno ${version}`}</footer>
         <Question {...this.state.question} />

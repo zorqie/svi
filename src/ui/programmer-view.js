@@ -7,23 +7,22 @@ export default class ProgrammerView extends Component {
 	componentDidMount() {
 		const { cueId, socket } = this.props
 		socket.on('state', this.receive)
-		socket.on('released', this.requestState)
-		socket.on('executed', this.requestState)
+		// socket.on('released', this.requestState)
+		// socket.on('executed', this.requestState)
 		socket.emit('get', cueId)
-		console.log("Monty", cueId)
 	}
 
 
 	componentWillUnmount() {
 		const { socket } = this.props
 		socket.removeListener('state', this.receive)
-		socket.removeListener('released', this.requestState)
-		socket.removeListener('executed', this.requestState)
-		console.log("Dismonty")
+		// socket.removeListener('released', this.requestState)
+		// socket.removeListener('executed', this.requestState)
 	}
 
 	requestState = (item, cue) => { 
 		const { cueId, socket } = this.props
+		console.log('probably executed', item, 'on', cue)
 		if (cue === cueId) {
 			socket.emit('get', cueId)
 		}
@@ -35,8 +34,8 @@ export default class ProgrammerView extends Component {
 	}
 
 	handleClick = (what, e) => {
-		const { cueId, socket } = this.props
-		if(e.ctrlKey) {
+		const { cueId, socket, locks } = this.props
+		if(locks.rel!=='off') {
 			socket.emit('release', what, cueId)
 		}
 		console.log("Clacked", what, e)

@@ -20,24 +20,13 @@ export default class Programmer extends Component {
 		if(command === '') {
 			return
 		}
-		const { cpu, set, rec } = this.props
-		if(set === 'started') {
-			cpu.emit('cpu', 'command', command)
-		} else {
-			request.post('http://localhost:8080/console', {form: { command }})
-		}
+		request.post('http://localhost:8080/console', {form: { command }})
 		this.setState({command: ''})
 	}
 
-	handleSet = e => {
-		e.preventDefault()
-		this.props.cpu.toggleSet(this.state.command)
-	}
 
 	render() {
-		const { cpu, rec, set } = this.props
 		const { command } = this.state
-		const empty = cpu && cpu.isEmpty() 
 
 		return (
 			<div id="programmer">
@@ -47,11 +36,6 @@ export default class Programmer extends Component {
 						onInput={this.handleChange}
 					/>
 				</form>
-				<button id="rec" onClick={cpu.toggleRec} className={rec}>Rec</button>
-				<button id="clear" onClick={cpu.clear} className={!empty}>
-					Clear
-				</button>
-				<button id="set" onClick={this.handleSet} className={set}>Name</button>
 			</div>
 		)
 	}

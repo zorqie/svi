@@ -63,7 +63,11 @@ class Grid extends Component {
   }
   handleClick = e => {
     e.preventDefault()
-    const { target } = e
+    let { target } = e
+    if(target.tagName === 'B') {
+      // active cell
+      target = target.parentElement
+    }
     if(target.tagName === 'TD') {
       const c = target.cellIndex
       const r = target.parentElement.rowIndex
