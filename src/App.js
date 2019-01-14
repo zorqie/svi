@@ -233,7 +233,7 @@ class App extends Component {
 
   render() {
     const { active, connected, heads, locks, visible, profiles, patched } = this.state
-    console.log("\nCUE\n", this.state.cue)
+    // console.log("\nCUE\n", this.state.cue)
     return (
       <div className={`App ${locks.rel}`} >
         <header>
