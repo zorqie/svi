@@ -202,16 +202,19 @@ class App extends Component {
     }
   }
 
-  lock = (what, e) => {
-    const { locks } = this.state
-    const last = locks && locks[what] === 'off'
-    const on = last ? e.shiftKey ? 'locked' : 'on' : 'off'
-    this.setState({locks: {...locks, [what]: on}})
+  lock = (what, check = ()=>true, e) => {
+    if(check()) {
+      const { locks } = this.state
+      const last = locks && locks[what] === 'off'
+      const on = last ? e.shiftKey ? 'locked' : 'on' : 'off'
+      this.setState({locks: {...locks, [what]: on}})
+        
+    }
   }
-  Lock = ({label, what, style, ...others}) => 
+  Lock = ({label, what, check, ...others}) => 
     <button 
       className={`lock ${what} ${this.state.locks[what]||''}`}
-      onClick={this.lock.bind(this, what)}
+      onClick={this.lock.bind(this, what, check)}
       onFocus={e=>e.target.blur()}
     >
       {label || what}
@@ -248,7 +251,7 @@ class App extends Component {
           <BigClock />
         </header>
         <div id="locks">
-          <this.Lock what='rel' />
+          <this.Lock what='rel' check={()=>this.state.locks.rec==='off'}/>
           <this.Lock what='set' />
           <this.Lock what='rec' />
         </div>

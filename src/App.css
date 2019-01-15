@@ -89,8 +89,11 @@ button:hover,
 button.primary:hover {
   border-color: #aaa;
 }
+
 .App.on table.ui-grid td:not(:empty):hover, 
 .App.locked table.ui-grid td:hover, 
+.App.on table.ui-grid td:not(:empty):hover *, 
+.App.locked table.ui-grid td:hover *, 
 .App.on table.cue tr:hover th,
 .App.on table.cue td:not(:empty):hover, 
 .App.locked table.cue td:hover {
@@ -124,6 +127,9 @@ table.ui-grid caption {
   font-size: smaller;
   letter-spacing: 0.75em;
   padding: 0.25em;
+}
+table.ui-grid td * {
+  margin: -0.24em;
 }
 table.ui-grid {
   float: left;

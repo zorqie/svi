@@ -21,10 +21,10 @@ const CueHeader = ({heads, patched, ch}) => {
 export default class CueView extends Component {
 
 	render() {
-		const { cue, onClick=()=>{}, ...others } = this.props
+		const { cue, caption, onClick=()=>{}, ...others } = this.props
 		return (
 			<table className="cue" {...others}>
-				<caption>Cue <b>{cue.label || cue.id}</b></caption>
+				<caption>{caption || cue.label || cue.id}</caption>
 				<thead>
 					{cue.cues && Object.keys(cue.cues).map(i => 
 						<tr>

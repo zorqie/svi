@@ -29,7 +29,7 @@ export default class ProgrammerView extends Component {
 	}
 
 	receive = cue => {
-		console.log("Got state", cue)
+		// console.log("Got state", cue)
 		this.setState({cue})
 	}
 
@@ -45,7 +45,7 @@ export default class ProgrammerView extends Component {
 		const { socket, ...others } = this.props
 		const { cue } = this.state
 		return (
-			cue && <CueTable cue={cue} {...others} onClick={this.handleClick}/>
+			cue && <CueTable caption="Programmer" cue={cue} {...others} onClick={this.handleClick}/>
 		)
 	}
 }
