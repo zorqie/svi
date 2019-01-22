@@ -42,10 +42,10 @@ export default class ProgrammerView extends Component {
 	}
 
 	render() {
-		const { socket, ...others } = this.props
+		// const { socket, ...others } = this.props
 		const { cue } = this.state
 		return (
-			cue && <CueTable caption="Programmer" cue={cue} {...others} onClick={this.handleClick}/>
+			cue && <CueTable caption="Programmer" cue={cue} {...this.props} onClick={this.handleClick}/>
 		)
 	}
 }

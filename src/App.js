@@ -8,6 +8,7 @@ import BigClock from './ui/big-clock'
 // import CommandLine from './ui/command-line'
 import CueGrid from './ui/cue-grid'
 import Grid from './ui/grid'
+import GroupGrid from './ui/group-grid'
 import Programmer from './ui/programmer'
 import ProgrammerView from './ui/programmer-view'
 import ProfileControl from './ui/profile-control'
@@ -100,7 +101,7 @@ class App extends Component {
   }
 
   init = msg => {
-    const { profiles, programCue, blindCue, setup, dmx } = msg
+    const { profiles, setup, dmx } = msg
     const patched = {}
     for(let d in setup.heads) {
       const { address, type, id } = setup.heads[d]
@@ -110,7 +111,7 @@ class App extends Component {
       }
       patched[address].start = ' from'
     }   
-    this.setState({inited: true, patched, profiles, dmx, programCue, blindCue, ...setup })
+    this.setState({inited: true, patched, profiles, dmx, ...setup })
     console.log("Initialized.", this)
   }
 
@@ -186,6 +187,12 @@ class App extends Component {
     this.setState({active: {...this.state.active, head}})
   }
 
+  execGroup = (r, c) => {
+    const { groups } = this.state
+    const group = groups[r*8+c]
+    console.log("Activated group", group)
+  }
+
   getOne = (channel) => {
     if (Array.isArray(channel)) {
       const val = this.state.dmx[channel[0]]
@@ -246,7 +253,8 @@ class App extends Component {
 
           <span>
             {this.renderToggle('CUES', 'cue')}
-            {this.renderToggle('HEAD', 'grp')}
+            {this.renderToggle('HEAD', 'head')}
+            {this.renderToggle('GRP', 'grp')}
           </span>
           <BigClock />
         </header>
@@ -273,8 +281,10 @@ class App extends Component {
                 heads={heads} 
                 patched={patched}
               />}
-        {visible.grp 
+        {visible.head 
           && <Grid key='heads' caption='Heads' renderItem={this.renderHead} exec={this.execHead} />}
+        {visible.grp 
+          && <GroupGrid key='groups' groups={this.state.groups} locks={locks} socket={socket} exec={this.execGroup} />}
         {active.head 
           && <ProfileControl 
             caption={active.head.name}

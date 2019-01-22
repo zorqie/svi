@@ -6,6 +6,8 @@ const ROWS = 8
 const rows = [...Array(ROWS).keys()]
 const cols = [...Array(COLS).keys()]
 
+const range = n => [...Array(n).keys()]
+
 class Grid extends Component {
   state = {
     focus: {r: -1, c: -1}
@@ -79,14 +81,15 @@ class Grid extends Component {
   }
   render() {
     const { caption, renderItem } = this.props
-    // console.log("Caption", caption)
+    const nRows = this.props.rows || 8
+    const nCols = this.props.cols || 8
     return (
       <table tabIndex="0" className='ui-grid' onKeyDown={this.handleKey} onClick={this.handleClick} onSelectStart={e => e.preventDefault()}>
         {caption && <caption>{caption}</caption>}
         <tbody>
-          {rows.map(r => (
+          {range(nRows).map(r => (
             <tr>
-              {cols.map(c => (
+              {range(nCols).map(c => (
                 <td {...this.focused(r,c)} >{renderItem(r,c)}</td>
               ))}
             </tr>

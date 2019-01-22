@@ -67,7 +67,10 @@ export default //function contentEditable(WrappedComponent) {
       if (this.props.editOnClick !== undefined) {
         editOnClick = this.props.editOnClick;
       }
-      let val = this.state.value || this.props.initialValue
+      let val = this.state.value 
+      if(typeof val === 'undefined') {
+        val = this.props.initialValue
+      }
       return (
         <td
           className={editing ? 'editing' : ''}

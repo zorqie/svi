@@ -2,7 +2,11 @@ import { Component, Fragment } from 'inferno'
 
 import Editable from './editable-hoc'
 
-const save = (ch) => (par, val) => console.log(ch, '.', par, '=', val)
+const save = (socket, ch) => 
+	(par, val) => {
+		console.log(ch, '.', par, '=', val)
+		socket.emit('exec', {values: {[ch]: {[par]: val}}})
+	}
 
 const CueValue = ({val, onSave}) => {
 	if(typeof val === 'object') {
@@ -12,7 +16,11 @@ const CueValue = ({val, onSave}) => {
 			<Editable initialValue={val.delay || ''} onSave={onSave.bind(null, 'delay')}/>
 		</Fragment>
 	} else {
-		return <Fragment><Editable initialValue={val} onSave={onSave}/><td></td><td></td></Fragment>
+		return <Fragment>
+			<Editable initialValue={val} onSave={onSave.bind(null, 'to')} />
+			<Editable initialValue='' onSave={onSave.bind(null, 'fade')} />
+			<Editable initialValue='' onSave={onSave.bind(null, 'delay')} />
+		</Fragment>
 	}
 }
 
@@ -25,7 +33,7 @@ const CueHeader = ({heads, patched, ch}) => {
 export default class CueView extends Component {
 
 	render() {
-		const { cue, caption, onClick=()=>{}, ...others } = this.props
+		const { cue, caption, onClick=()=>{}, socket, ...others } = this.props
 		return (
 			<table className="cue" >
 				<caption>{caption || cue.label || cue.id}</caption>
@@ -46,7 +54,7 @@ export default class CueView extends Component {
 				{Object.keys(cue.values).map(v => 
 					<tr key={v} onClick={onClick.bind(null, {[v]:cue.values[v]})}>
 						<CueHeader {...others} ch={v} />
-						<CueValue val={cue.values[v]} {...others} onSave={save(cue.values[v])}/>
+						<CueValue val={cue.values[v]} {...others} onSave={save(socket, v)}/>
 					</tr>
 				)}
 				</tbody>
