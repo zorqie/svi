@@ -7,8 +7,9 @@ import BigClock from './ui/big-clock'
 // import ChannelSlider from './ui/channel-slider'
 // import CommandLine from './ui/command-line'
 import CueGrid from './ui/cue-grid'
-import Grid from './ui/grid'
+// import Grid from './ui/grid'
 import GroupGrid from './ui/group-grid'
+import HeadsGrid from './ui/heads-grid'
 import Programmer from './ui/programmer'
 import ProgrammerView from './ui/programmer-view'
 import ProfileControl from './ui/profile-control'
@@ -28,6 +29,7 @@ class App extends Component {
     super()
     this.state = {
       inited: false,
+      connected: false,
       dmx: {},
       active: {},
       visible: {},
@@ -61,17 +63,19 @@ class App extends Component {
     })
     document.addEventListener('keydown', this.presser)
     document.addEventListener('keyup', this.keyup)
+    console.log("App mounted.")
   }
 
   componentWillUnmount() {
+    console.log("App unmounting...")
     socket.removeListener('init', this.init)
     socket.removeListener('update', this.receiveUpdate)
     socket.removeListener('question', this.receiveQuestion)
     socket.removeListener('executed', this.requestState)
     socket.removeListener('released', this.requestState)
     socket.removeListener('state', this.receiveState)
-    document.removeEvemtListener('keydown', this.presser)
-    document.removeEvemtListener('keyup', this.keyup)
+    document.removeEventListener('keydown', this.presser)
+    document.removeEventListener('keyup', this.keyup)
   }
 
   keyup = e => e.key==='Control' && this.setState({locks: {...this.state.locks, rel:'off'}})
@@ -181,10 +185,23 @@ class App extends Component {
     }
   }
 
-  execHead = (r, c) => {
-    const { heads } = this.state
-    const head = heads[r*8+c]
-    this.setState({active: {...this.state.active, head}})
+  execHead = head => {
+    if(head) {
+      const { active } = this.state
+      const { add, remove } = head
+      const { heads = [] } = active
+      if(add) {
+        this.setState({active: {...this.state.active, head: add, heads: heads.filter(h => h.id!==add.id).concat(add)}})
+        
+      } else if(remove) {
+        console.log("Remove: ", remove)
+        this.setState({active: {...this.state.active, head: remove, heads: heads.filter(h => h.id!==remove.id)}})
+
+      } else {
+        this.setState({active: {...this.state.active, head, heads: [head]}})
+
+      }
+    }
   }
 
   execGroup = (r, c) => {
@@ -232,13 +249,13 @@ class App extends Component {
     const v = visible && visible[what]
     this.setState({visible: {...visible, [what]: !v}})
   }
-  renderToggle = (label, what) =>
+  renderToggle = (what, label) =>
     <button 
       className={`toggle ${this.state.visible[what]}`} 
       onClick={this.toggle.bind(this, what)}
       onFocus={e=>e.target.blur()}
     >
-      {label}
+      {label || what.toUpperCase()}
     </button>
 
   render() {
@@ -248,13 +265,13 @@ class App extends Component {
       <div className={`App ${locks.rel}`} >
         <header>
           <span className={`title ${connected}`}>Ze Desk</span>
-          {this.renderToggle('DMX', 'dmx')}
-          {this.renderToggle('PGM', 'pgm')}
+          {this.renderToggle('dmx')}
+          {this.renderToggle('pgm')}
 
           <span>
-            {this.renderToggle('CUES', 'cue')}
-            {this.renderToggle('HEAD', 'head')}
-            {this.renderToggle('GRP', 'grp')}
+            {this.renderToggle('cue', 'CUES')}
+            {this.renderToggle('head')}
+            {this.renderToggle('grp')}
           </span>
           <BigClock />
         </header>
@@ -282,7 +299,7 @@ class App extends Component {
                 patched={patched}
               />}
         {visible.head 
-          && <Grid key='heads' caption='Heads' renderItem={this.renderHead} exec={this.execHead} />}
+          && <HeadsGrid key='heads' heads={heads} active={active} select={this.execHead} />}
         {visible.grp 
           && <GroupGrid key='groups' groups={this.state.groups} locks={locks} socket={socket} exec={this.execGroup} />}
         {active.head 

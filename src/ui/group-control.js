@@ -32,7 +32,7 @@ const group = channels => {
 
 const dmx = val => val > 255 ? 255 : val < 0 ? 0 : val
 
-export default class ProfileControl extends Component {
+export default class GroupControl extends Component {
 	state = {
 		visible: {}
 	}
@@ -73,11 +73,27 @@ export default class ProfileControl extends Component {
 		}
 	}
 
+//TODO extract toggle to own class
+	toggle = what => {
+		const { visible } = this.state
+		const v = visible && visible[what]
+		this.setState({visible: {...visible, [what]: !v}})
+	}
+	renderToggle = (what, label) =>
+		<button 
+			className={`toggle ${this.state.visible[what]}`} 
+			onClick={this.toggle.bind(this, what)}
+			onFocus={e=>e.target.blur()}
+		>
+	    	{label || what.toUpperCase()}
+    	</button>
+
 	render() {
-		const { caption, profile, address, getDmx } = this.props
-		return profile && (
+		const { caption, profiles, selected, address, getDmx } = this.props
+		const profile = 
+		return (
 			<div className="profile">
-				<div>{caption}</div>
+				<div>{caption} <span>{this.renderToggle('all')}</span></div>
 				
 				{profile.channels.map((ch, i) => 
 					<ChannelSlider 

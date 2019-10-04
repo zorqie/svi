@@ -3,10 +3,9 @@ import { Component } from 'inferno';
 const COLS = 8
 const ROWS = 8
 
-const rows = [...Array(ROWS).keys()]
-const cols = [...Array(COLS).keys()]
-
 const range = n => [...Array(n).keys()]
+
+const prevent = e => e.preventDefault()
 
 class Grid extends Component {
   state = {
@@ -68,6 +67,7 @@ class Grid extends Component {
     let { target } = e
     if(target.tagName === 'B') {
       // active cell
+      // TOOD use own 'active' flag, not tagName
       target = target.parentElement
     }
     if(target.tagName === 'TD') {
@@ -81,10 +81,10 @@ class Grid extends Component {
   }
   render() {
     const { caption, renderItem } = this.props
-    const nRows = this.props.rows || 8
-    const nCols = this.props.cols || 8
+    const nRows = this.props.rows || ROWS
+    const nCols = this.props.cols || COLS
     return (
-      <table tabIndex="0" className='ui-grid' onKeyDown={this.handleKey} onClick={this.handleClick} onSelectStart={e => e.preventDefault()}>
+      <table tabIndex="0" className='ui-grid' onKeyDown={this.handleKey} onClick={this.handleClick} onSelectStart={prevent}>
         {caption && <caption>{caption}</caption>}
         <tbody>
           {range(nRows).map(r => (

@@ -5,11 +5,11 @@ import Grid from './grid'
 export default class CueGrid extends Component {
 	state = { group: null }
 	componentDidMount() {
-		const { socket } = this.props
+		// const { socket } = this.props
 	}
 
 	componentWillUnmount() {
-		const { socket } = this.props
+		// const { socket } = this.props
 	}
 
 	renderGroup = (r, c) => {
@@ -26,7 +26,7 @@ export default class CueGrid extends Component {
 	}
 
 	execGroup = (r, c, e) => {
-		const { groups, socket, locks, exec } = this.props
+		const { groups, /*socket,*/ locks, exec } = this.props
 		const { altKey, ctrlKey/*, shiftKey*/ } = e
 		const index = r*8+c
 		const group = groups[index]
@@ -44,7 +44,7 @@ export default class CueGrid extends Component {
 				} else if(altKey) {
 					this.setState({group})
 				} else {
-					console.log("Executing", group)
+					console.log("Executing", group, exec)
 					// socket.emit('execute', group, 'pgm')
 				}
 			}
@@ -61,9 +61,10 @@ export default class CueGrid extends Component {
 	}
 
 	render() {
+		const { rows = 6, cols = 6 } = this.props
 		return (
 			<div>
-				<Grid caption="Groups" rows={6} cols={6} renderItem={this.renderGroup} exec={this.execGroup} />
+				<Grid caption="Groups" rows={rows} cols={cols} renderItem={this.renderGroup} exec={this.execGroup} />
 			</div>
 		)
 	}
