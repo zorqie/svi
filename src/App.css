@@ -70,6 +70,9 @@ table.ui-grid td {
 table td.focus {
   background-color: #444;
 }
+table td.focus * {
+  background-color: transparent;
+}
 table.ui-grid td * {
   position: relative;
   display: block;
