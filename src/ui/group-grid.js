@@ -27,13 +27,12 @@ export default class CueGrid extends Component {
 
 	execGroup = (r, c, e) => {
 		const { groups, /*socket,*/ locks, exec } = this.props
-		const { altKey, ctrlKey/*, shiftKey*/ } = e
+		const { altKey, ctrlKey, shiftKey } = e
 		const index = r*8+c
 		const group = groups[index]
-		console.log("Exec?", group, locks)
+		// console.log("Exec?", group, locks)
 		if(group) {
 			if(locks && locks.rec !== 'off') {
-				// const nueGroup = cpu.getPreset(group)
 				console.log("Updating", )
 				// socket.emit('group', group, 'update')
 				
@@ -41,11 +40,21 @@ export default class CueGrid extends Component {
 				if(ctrlKey || (locks && locks.rel !== 'off') ) {
 					console.log("Releasing", group)
 					// socket.emit('release', group, 'pgm')
+					if(exec) {
+						exec({remove: group})
+					}
+				} else if(shiftKey || (locks && locks.add !== 'off')) {
+					if(exec) {
+						exec({add: group})
+					}
 				} else if(altKey) {
 					this.setState({group})
 				} else {
-					console.log("Executing", group, exec)
+					console.log("Executing", group)
 					// socket.emit('execute', group, 'pgm')
+					if(exec){
+						exec(group)
+					}
 				}
 			}
 		} else {
@@ -53,7 +62,6 @@ export default class CueGrid extends Component {
 				this.setState({group})
 			}
 			if(locks && locks.rec !== 'off') {
-				// const nueGroup = cpu.getPreset({id: 'p'+index, label: 'p'+index})
 				console.log("Saving", {r, c})
 				// socket.emit('group', {group: 'pgm', r, c}, 'add')
 			}

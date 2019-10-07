@@ -34,6 +34,7 @@ class App extends Component {
       active: {},
       visible: {},
       locks: {
+        add: 'off',
         rel: 'off',
         set: 'off',
         inc: 'off',
@@ -48,7 +49,7 @@ class App extends Component {
 
   componentDidMount() {
     socket.on('init', this.init)
-    socket.on('update', this.receiveUpdate)
+    socket.on('update', this.receiveDmx)
     socket.on('disconnect', () => this.setState({connected: false}))
     socket.on('connect', () => this.setState({connected: true}))
     socket.on('question', this.receiveQuestion)
@@ -56,6 +57,10 @@ class App extends Component {
     socket.on('executed', this.requestState)
     socket.on('released', this.requestState)
     socket.on('state', this.receiveState)
+
+    socket.on('info', (message, what) => {
+      console.log("INFO:", message, what)
+    })
 
     socket.on('warn', (message, what) => {
       console.log("WARN", message, what)
@@ -69,7 +74,7 @@ class App extends Component {
   componentWillUnmount() {
     console.log("App unmounting...")
     socket.removeListener('init', this.init)
-    socket.removeListener('update', this.receiveUpdate)
+    socket.removeListener('update', this.receiveDmx)
     socket.removeListener('question', this.receiveQuestion)
     socket.removeListener('executed', this.requestState)
     socket.removeListener('released', this.requestState)
@@ -78,8 +83,17 @@ class App extends Component {
     document.removeEventListener('keyup', this.keyup)
   }
 
-  keyup = e => e.key==='Control' && this.setState({locks: {...this.state.locks, rel:'off'}})
-  // TODO move this to dialogs. No need to listen all the time
+  keyup = e => {
+    switch(e.key) {
+      case 'Control':
+        this.setState({locks: {...this.state.locks, rel:'off'}})
+        break
+      case 'Shift':
+        this.setState({locks: {...this.state.locks, add:'off'}})
+        break
+      default:
+    }
+  }
   presser = e => {
     const { question } = this.state
     if(e.key==='Control') {
@@ -87,7 +101,13 @@ class App extends Component {
       if(rel !== 'on') {
         this.setState({locks: {...this.state.locks, rel:'on'}})
       }
+    } else if(e.key==='Shift') {
+      const { add } = this.state.locks
+      if(add !== 'on') {
+        this.setState({locks: {...this.state.locks, add:'on'}})
+      }
     }
+  // TODO move this to dialogs? No need to listen all the time
     if(question && question.message) {
       switch(e.key) {
         case 'Enter':
@@ -114,7 +134,10 @@ class App extends Component {
         patched[address + 1*c] = {head: id, type: profile.channels[c]}
       }
       patched[address].start = ' from'
-    }   
+    }
+    setup.groups.forEach(group => {
+      group.heads = group.heads.map(hid => setup.heads.find(h => h.id===hid))
+    })
     this.setState({inited: true, patched, profiles, dmx, ...setup })
     console.log("Initialized.", this)
   }
@@ -128,14 +151,14 @@ class App extends Component {
     this.setState({cue})
   }
 
-  receiveUpdate = u => {
-    // console.time("receiveUpdate")
+  receiveDmx = u => {
+    // console.time("receiveDmx")
     const dmx = this.state.dmx
     for(var i in u) {
       dmx[i] = u[i]
     }
     this.setState({dmx})
-    // console.timeEnd("receiveUpdate")
+    // console.timeEnd("receiveDmx")
   }
 
   clearQuestion = () => this.setState({question: {}})
@@ -174,21 +197,10 @@ class App extends Component {
   //   this.setState({cpu:{...this.state.cpu, [which]: status}, status: msg})
   // }
 
-  renderHead = (r, c) => {
-    const { active, heads } = this.state
-    const d = heads && heads[r*8+c]
-    if(d) {
-      const a = active && active.head && active.head.id === d.id
-      return a ? <b>{d.name}</b> : d.name
-    } else {
-      return null
-    }
-  }
-
   execHead = head => {
     if(head) {
       const { active } = this.state
-      const { add, remove } = head
+      const { add, remove, clear } = head
       const { heads = [] } = active
       if(add) {
         this.setState({active: {...this.state.active, head: add, heads: heads.filter(h => h.id!==add.id).concat(add)}})
@@ -197,6 +209,9 @@ class App extends Component {
         console.log("Remove: ", remove)
         this.setState({active: {...this.state.active, head: remove, heads: heads.filter(h => h.id!==remove.id)}})
 
+      } else if(clear==='all') {
+        this.setState({active: {...this.state.active, head: null, heads: []}})        
+
       } else {
         this.setState({active: {...this.state.active, head, heads: [head]}})
 
@@ -204,9 +219,16 @@ class App extends Component {
     }
   }
 
-  execGroup = (r, c) => {
-    const { groups } = this.state
-    const group = groups[r*8+c]
+  execGroup = group => {
+    const { add, remove, heads } = group
+    if(remove) {
+      remove.heads.forEach(h => this.execHead({remove: h}))
+    } else if(add) {
+      add.heads.forEach(h => this.execHead({add: h}))
+    } else if(heads) {
+      this.execHead({clear: 'all'})
+      heads.forEach(h => this.execHead({add: h}))
+    }
     console.log("Activated group", group)
   }
 
@@ -276,6 +298,7 @@ class App extends Component {
           <BigClock />
         </header>
         <div id="locks">
+          <this.Lock what='add' />
           <this.Lock what='rel' check={()=>this.state.locks.rec==='off'}/>
           <this.Lock what='set' />
           <this.Lock what='rec' />
@@ -299,9 +322,19 @@ class App extends Component {
                 patched={patched}
               />}
         {visible.head 
-          && <HeadsGrid key='heads' heads={heads} active={active} select={this.execHead} />}
+          && <HeadsGrid 
+                heads={heads} 
+                active={active} 
+                locks={locks}
+                select={this.execHead}
+              />}
         {visible.grp 
-          && <GroupGrid key='groups' groups={this.state.groups} locks={locks} socket={socket} exec={this.execGroup} />}
+          && <GroupGrid 
+                groups={this.state.groups} 
+                locks={locks} 
+                socket={socket} 
+                exec={this.execGroup} 
+              />}
         {active.head 
           && <ProfileControl 
             caption={active.head.name}

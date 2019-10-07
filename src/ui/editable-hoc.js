@@ -54,6 +54,8 @@ export default //function contentEditable(WrappedComponent) {
         case 'Escape':
           this.save()
           break
+        default:
+        
       }
     }
     handleInput = e => {
